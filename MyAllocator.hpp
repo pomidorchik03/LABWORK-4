@@ -1,20 +1,24 @@
 #pragma once
 
 #include <cstddef> 
-#include <new>     
-#include <limits>  
+#include <new> 
+#include <limits> 
+#include <iostream>
+#include <algorithm> 
 
 template <typename T, size_t N>
 class MyAllocator {
 private:
-    char* pool_;
-    void* free_list_head_;
-    size_t pool_size_bytes_;
-
-    struct Slot {
-        char element[sizeof(T)];
-        Slot* next;
+    union Slot {
+        alignas(T) char element[sizeof(T)]; 
+        Slot* next; 
     };
+
+    static constexpr size_t BLOCK_SIZE = sizeof(T) > sizeof(Slot*) ? sizeof(T) : sizeof(Slot*);
+
+    char* pool_;
+    Slot* free_list_head_; 
+    size_t pool_size_bytes_;
 
     bool isInPool(T* p) const;
 
@@ -29,8 +33,16 @@ public:
     MyAllocator() noexcept;
     ~MyAllocator() noexcept;
 
+    // ЗАПРЕТ КОПИРОВАНИЯ
+    MyAllocator(const MyAllocator&) = delete;
+    MyAllocator& operator=(const MyAllocator&) = delete;
+
+    // РАЗРЕШЕНИЕ ПЕРЕМЕЩЕНИЯ
+    MyAllocator(MyAllocator&& other) noexcept;
+    MyAllocator& operator=(MyAllocator&& other) noexcept;
+
     template <class U>
-    MyAllocator(const MyAllocator<U, N>& other) noexcept;
+    MyAllocator(const MyAllocator<U, N>& other) noexcept; 
 
     T* allocate(std::size_t n);
     void deallocate(T* p, std::size_t n);

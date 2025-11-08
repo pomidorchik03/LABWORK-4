@@ -3,6 +3,7 @@
 #include <utility> 
 
 #include "MyContainer.hpp" 
+#include "MyAllocator.hpp"
 
 long long factorial(int n) {
     long long res = 1;
@@ -35,7 +36,7 @@ int main() {
 
     std::cout << "Outputting mapCustom contents:" << std::endl;
     for (const auto& pair : mapCustom) {
-        std::cout << "  " << pair.first << " " << pair.second << std::endl;
+        std::cout << " " << pair.first << " " << pair.second << std::endl;
     }
 
 
@@ -47,12 +48,10 @@ int main() {
         containerDefault.push_back(i);
     }
 
-    
-    using MyContainerAllocator = MyAllocator<int, 10>;
-    using CustomContainer = MyContainer<int, MyContainerAllocator>;
+
 
     std::cout << "Creating MyContainer (MyAllocator<int, 10>)" << std::endl;
-    CustomContainer containerCustom;
+    MyContainer<int, MyAllocator<int, 10>> containerCustom;
     
     std::cout << "Filling with 10 elements (0-9)" << std::endl;
     for (int i = 0; i < 10; ++i) {
@@ -60,7 +59,7 @@ int main() {
     }
 
     std::cout << "Outputting containerCustom contents:" << std::endl;
-    std::cout << "  ";
+    std::cout << " ";
     for (int value : containerCustom) {
         std::cout << value << " ";
     }
