@@ -21,7 +21,6 @@ MyAllocator<T, N>::MyAllocator() noexcept
     }
 }
 
-// Конструктор перемещения
 template <typename T, size_t N>
 MyAllocator<T, N>::MyAllocator(MyAllocator&& other) noexcept
     : pool_(other.pool_), 
@@ -33,7 +32,6 @@ MyAllocator<T, N>::MyAllocator(MyAllocator&& other) noexcept
     other.pool_size_bytes_ = 0;
 }
 
-// Оператор присваивания перемещением
 template <typename T, size_t N>
 MyAllocator<T, N>& MyAllocator<T, N>::operator=(MyAllocator&& other) noexcept {
     if (this != &other) {
@@ -52,10 +50,8 @@ MyAllocator<T, N>& MyAllocator<T, N>::operator=(MyAllocator&& other) noexcept {
 
 template <typename T, size_t N>
 MyAllocator<T, N>::~MyAllocator() noexcept {
-    if (pool_ != nullptr) { // Проверяем, что пул не был перемещен
-        std::cout << "Allocator: start deleting." << std::endl;
+    if (pool_ != nullptr) { 
         ::operator delete(pool_);
-        std::cout << "Allocator: deleted." << std::endl;
     }
 }
 

@@ -9,12 +9,12 @@
 template <typename T, size_t N>
 class MyAllocator {
 private:
-    union Slot {
-        alignas(T) char element[sizeof(T)]; 
+    struct Slot {
+        char element[sizeof(T)]; 
         Slot* next; 
     };
 
-    static constexpr size_t BLOCK_SIZE = sizeof(T) > sizeof(Slot*) ? sizeof(T) : sizeof(Slot*);
+    size_t BLOCK_SIZE = sizeof(T) > sizeof(Slot*) ? sizeof(T) : sizeof(Slot*);
 
     char* pool_;
     Slot* free_list_head_; 
@@ -33,11 +33,9 @@ public:
     MyAllocator() noexcept;
     ~MyAllocator() noexcept;
 
-    // ЗАПРЕТ КОПИРОВАНИЯ
     MyAllocator(const MyAllocator&) = delete;
     MyAllocator& operator=(const MyAllocator&) = delete;
 
-    // РАЗРЕШЕНИЕ ПЕРЕМЕЩЕНИЯ
     MyAllocator(MyAllocator&& other) noexcept;
     MyAllocator& operator=(MyAllocator&& other) noexcept;
 
