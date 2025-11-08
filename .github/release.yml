@@ -1,0 +1,79 @@
+name: 'C++ CI'
+
+on:
+  push
+
+jobs:
+  build: 
+    permissions: write-all
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Init
+        run: cmake . -DPATCH_VERSION=${{ github.run_number }}
+
+      - name: Check
+        run: dir
+
+      - name: Build
+        run: cmake --build . --config Release
+
+      - name: Pack
+        run: cpack --config CPackConfig.cmake
+
+      - name: Run check
+        if: runner.os == 'Windows'
+        run:  ./Release/lab.exe
+
+      - name: Run check
+        if: runner.os == 'Linux'
+        run: ./lab
+
+      - name: check
+        run: dir
+
+      - name: Upload artifact
+        if: runner.os == 'Windows'
+        uses: actions/upload-artifact@v4
+        with:
+          name: lab-${{ runner.os }}
+          path: lab-*.zip
+
+      - name: Upload artifact
+        if: runner.os == 'Linux'
+        uses: actions/upload-artifact@v4
+        with:
+          name: lab-${{ runner.os }}
+          path: lab-*.deb
+            
+      
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+      - name: Download
+        uses: actions/download-artifact@v4    
+        with:
+          path: artifact
+
+      - run: ls -R
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            artifact/lab-Linux/lab-*.deb
+            artifact/lab-Windows/lab-*.zip
+          tag_name: 1.0.${{ github.run_number }}
+          body: "Release 1.0.${{ github.run_number }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
