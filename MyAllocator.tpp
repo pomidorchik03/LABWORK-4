@@ -22,7 +22,7 @@ MyAllocator<T, N>::~MyAllocator() noexcept {
 
 template <typename T, size_t N>
 template <class U>
-MyAllocator<T, N>::MyAllocator(const MyAllocator<U, N>& other) noexcept: MyAllocator() {}
+MyAllocator<T, N>::MyAllocator(const MyAllocator<U, N>&) noexcept: MyAllocator() {}
 
 template <typename T, size_t N>
 bool MyAllocator<T, N>::isInPool(T* p) const {
