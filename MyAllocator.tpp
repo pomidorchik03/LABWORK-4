@@ -2,11 +2,8 @@ template <typename T, size_t N>
 MyAllocator<T, N>::MyAllocator() noexcept 
     : pool_(nullptr), free_list_head_(nullptr), pool_size_bytes_(N * BLOCK_SIZE) {
     
-    std::cout << "Allocator: Constructor called. Size: " << pool_size_bytes_ << " (Block Size: " << BLOCK_SIZE << ")" << std::endl;
-    
     if (N > 0) {
         pool_ = static_cast<char*>(::operator new(pool_size_bytes_));
-        std::cout << "Allocator: Pool memory allocated." << std::endl;
         
         free_list_head_ = reinterpret_cast<Slot*>(pool_);
         Slot* current = free_list_head_;
@@ -17,7 +14,6 @@ MyAllocator<T, N>::MyAllocator() noexcept
             current = next;
         }
         current->next = nullptr;
-        std::cout << "Allocator: Free list initialized." << std::endl;
     }
 }
 
